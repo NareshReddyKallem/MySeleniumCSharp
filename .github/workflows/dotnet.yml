@@ -1,28 +1,62 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET
+name: Run Selenium Tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-  build:
-
+  selenium-tests:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+    # Step 1: Checkout the code
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Setup .NET SDK
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore POMFramework/POMFramework/POMFramework.sln
-    - name: Build
-      run: dotnet build POMFramework/POMFramework/POMFramework.sln
-    - name: Test
-      run: dotnet test POMFramework/POMFramework/POMFramework.sln
+        dotnet-version: 8.0
+
+    # Step 3: Install Google Chrome
+    - name: Install Google Chrome
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+
+    # Step 4: Install ChromeDriver
+    - name: Install ChromeDriver
+      run: |
+        CHROME_VERSION=$(google-chrome --version | grep -oP '\d+' | head -1)
+        DRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION)
+        wget https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip
+        unzip chromedriver_linux64.zip -d /usr/local/bin/
+        chmod +x /usr/local/bin/chromedriver
+
+    # Step 5: Restore .NET dependencies
+    - name: Restore .NET dependencies
+      run: dotnet restore
+
+    # Step 6: Build the project
+    - name: Build the project
+      run: dotnet build --configuration Debug
+
+    # Step 7: Grant execute permissions for selenium-manager
+    - name: Grant execute permissions for selenium-manager
+      run: chmod +x ./POMFramework/bin/Debug/net8.0/selenium-manager/linux/selenium-manager
+
+    # Step 8: Run Selenium tests
+    - name: Run tests
+      run: dotnet test --logger:trx --results-directory ./TestResults
+
+    # Step 9: Upload test results (optional)
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: TestResults
+        path: ./TestResults/
