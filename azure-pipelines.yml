@@ -9,6 +9,10 @@ trigger:
 pool:
   name: "Default"
   #vmImage: "windows"
+  demands:
+  - msbuild -equals '17.12.12.57101'
+  - agent.version -equals '4.248.0'
+  - agent.os -equals Windows_NT
   
 
 
@@ -18,15 +22,9 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: VisualStudioTestPlatformInstaller@1
-  inputs:
-    packageFeedSelector: 'nugetOrg'
-    versionSelector: 'latestStable'
-  displayName: 'Install Visual Studio Build Tools'
 - script: |
     ls
     cd POMFramework/POMFramework
-
 
 - task: NuGetToolInstaller@1
 
