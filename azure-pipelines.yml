@@ -7,8 +7,8 @@ trigger:
 - main
 
 pool:
-  name: 'Azure Pipelines'
-  vmImage: 'self-hosted'
+  name: 'Default'
+  vmImage: 'windows'
 
 
 variables:
