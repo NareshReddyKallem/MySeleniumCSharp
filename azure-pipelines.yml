@@ -7,8 +7,7 @@ trigger:
 - main
 
 pool:
-  name: 'Default'
-  vmImage: 'windows'
+  vmImage: "windows"
 
 
 variables:
@@ -22,6 +21,7 @@ steps:
 - task: NuGetCommand@2
   inputs:
     restoreSolution: '$(solution)'
+  condition: 
 
 - task: VSBuild@1
   inputs:
