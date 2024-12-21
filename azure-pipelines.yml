@@ -13,6 +13,7 @@ pool:
   - msbuild -equals '17.12.12.57101'
   - agent.version -equals '4.248.0'
   - agent.os -equals Windows_NT
+  - visualstudio -equals '17.0'
   
 
 
